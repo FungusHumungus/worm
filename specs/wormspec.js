@@ -324,9 +324,7 @@ describe ("Worm", function() {
                            relationships: [{field: 'children', maps_to: 'child', with_field: 'data_id'}]
                           };
         var child_schema = {table: 'child',
-                            many_to_many: {parent_field: 'data_id',
-                                           child_field: 'grandchild_id'
-                                          },
+                            primarykey: ['data_id', 'grandchild_id'],
                             fields: {data_id: null, grandchild_id: null},
                             relationships: [{field: 'grandchildren', maps_to: 'grandchild', with_our_field: 'grandchild_id'}]};
         var grandchild_schema = {table: 'grandchild',
