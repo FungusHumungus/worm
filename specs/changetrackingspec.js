@@ -1,6 +1,7 @@
 describe("When tracking changes", function() {
   var diffs = require('../lib/diffs'),
-      schemas = require('../lib/schemas');
+      schemas = require('../lib/schemas'),
+      removePrivates = require('../lib/removePrivates').removePrivates;
 
   describe("given a simple object", function() {
     var obj;
@@ -98,6 +99,11 @@ describe("When tracking changes", function() {
         expect(changes.obj.children[1]).toEqual({status: 'changed',
                                                  obj: {parentId: 1, childId: 2, x: 42},
                                                  change: {x: {from: 32, to: 42}}});
+      });
+
+      it("doesn't mutate the object", function() {
+        expect(removePrivates(obj)).toEqual({id: 1, b:2, children:[{parentId: 1, childId: 1, x: 1},
+                                                                   {parentId: 1, childId: 2, x: 42}]});
       });
     });
   });
