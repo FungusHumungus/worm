@@ -1,0 +1,11 @@
+var q = require('q');
+
+console.log('start');
+
+var d = q.defer();
+
+q.when(d.promise).then(console.log);
+
+console.log('end');
+
+d.resolve('promise');
