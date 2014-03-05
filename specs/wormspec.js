@@ -14,7 +14,7 @@ describe ("Worm", function() {
 
   beforeEach(function() {
     // Set up the mocks
-    query = jasmine.createSpyObj('query', ['insert', 'update', 'select', 'remove']),
+    query = jasmine.createSpyObj('query', ['insert', 'update', 'select', 'remove']);
     core = core_(query);
     wormmodel = wormmodel_(core);
   });
@@ -329,7 +329,7 @@ describe ("Worm", function() {
                             relationships: [{field: 'grandchildren', maps_to: 'grandchild', with_our_field: 'grandchild_id'}]};
         var grandchild_schema = {table: 'grandchild',
                                  fields: {id: null, ook1: ''}};
-        var data, db = {};
+        var data;
 
         describe("when updating the model", function() {
             beforeEach(function() {

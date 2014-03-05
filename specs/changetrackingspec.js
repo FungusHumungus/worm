@@ -52,7 +52,6 @@ describe("When tracking changes", function() {
     describe("when the child object changes", function() {
       beforeEach(function() {
         obj.child.y = 42;
-        debugger;
         changes = obj.__diffs();
       });
 
