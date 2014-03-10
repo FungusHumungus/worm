@@ -246,17 +246,20 @@ describe ("Worm", function() {
                 schemas.registerSchema(child_schema);
 
                 data = {field1: 'data1', field2: 'data2', children:[{ook1: 'doto1'}]};
-                result = core.saveModel(db, 'data', data);
+                result = core.saveModel(db, 'data', data).catch(function(err){
+                  console.log(err.toString());
+                });
             });
 
             afterEach(function() {
                 schemas.clearSchema();
             });
 
-            it("should insert the parent record", function() {
-                process.nextTick(function() {
-                    expect(query.insert).toHaveBeenCalledWith(db, 'data', {field1: 'data1', field2: 'data2'}, {returnId: true});
-                });
+            it("should insert the parent record", function(done) {
+              process.nextTick(function() {
+                expect(query.insert).toHaveBeenCalledWith(db, 'data', {field1: 'data1', field2: 'data2'}, {returnId: true});
+                done();
+              });
             });
 
             it("should insert the child record with the parents id", function(done) {
@@ -287,6 +290,7 @@ describe ("Worm", function() {
                     schemas.registerSchema(child_schema);
 
                     data = {field1: 'data1', field2: 'data2', children:[{ook1: 'doto1'}]};
+                  console.log('saving fail');
                     result = core.saveModel(db, 'data', data);
                 } catch(ex) {
                     console.log('Error when save fails : ' + ex.toString());
@@ -300,8 +304,8 @@ describe ("Worm", function() {
             it("should reject the promise", function() {
                 var passed = false, failed = false;
                 runs(function() {
-                    result.then(function() { passed = true; },
-                                function() { failed = true; });
+                    result.then(function() { passed = true; })
+                          .catch(function() { failed = true; });
                 });
 
                 waitsFor(function() {
@@ -329,7 +333,9 @@ describe ("Worm", function() {
                             relationships: [{field: 'grandchildren', maps_to: 'grandchild', with_our_field: 'grandchild_id'}]};
         var grandchild_schema = {table: 'grandchild',
                                  fields: {id: null, ook1: ''}};
-        var data;
+        var data,
+            result;
+
 
         describe("when updating the model", function() {
             beforeEach(function() {
@@ -345,7 +351,7 @@ describe ("Worm", function() {
                                    {data_id: 1, grandchild_id: 3,
                                     grandchildren: {id: 3, ook1: 'onk2'}}]};
 
-                core.saveModel(db, 'data', data);
+                result = core.saveModel(db, 'data', data);
             });
 
             afterEach(function() {
@@ -353,7 +359,7 @@ describe ("Worm", function() {
             });
 
             it("updates the parent table", function(done) {
-              process.nextTick(function() {
+              result.then(function() {
                 expect(query.update).toHaveBeenCalledWith(db, 'data', {id: 1, field1: 'ook1', field2: 'ook2'});
                 done();
               });
@@ -361,11 +367,9 @@ describe ("Worm", function() {
 
             it("removes the many to many row", function(done) {
               // This call is many promises deep, so we have to wait for two cycles..
-              process.nextTick(function() {
-                process.nextTick(function() {
-                  expect(query.remove).toHaveBeenCalledWith(db, 'child', 'data_id=$1', [1]);
-                  done();
-                });
+              result.then(function() {
+                expect(query.remove).toHaveBeenCalledWith(db, 'child', 'data_id=$1', [1]);
+                done();
               });
             });
         });
