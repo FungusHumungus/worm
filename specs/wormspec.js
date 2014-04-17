@@ -109,7 +109,7 @@ describe ("Worm", function() {
 
             it("lets you select with other criteria as well", function() {
                 query.select.andReturn({then: function(){}});
-                core.get_by(db, 'data', "field1 = $1", ['onk']);
+                core.get_by(db, 'data', {where: "field1 = $1", params:['onk']});
                 expect(query.select).toHaveBeenCalledWith(db, 'data',
                                                           '*',
                                                           'field1 = $1', '', ['onk'], null);
