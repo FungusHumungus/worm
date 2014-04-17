@@ -1,6 +1,6 @@
 
 describe("given a schema with an insert only relationship", function() {
-   var q = require('Q'),
+   var q = require('q'),
       _ = require('lodash'),
       db = {},
       schemas = require('../lib/schemas'),

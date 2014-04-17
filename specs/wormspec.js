@@ -2,7 +2,7 @@
  runs: false, waitsFor: false, process: false, require: false*/
 
 describe ("Worm", function() {
-  var q = require('Q'),
+  var q = require('q'),
       _ = require('lodash'),
       db = {},
       schemas = require('../lib/schemas'),
