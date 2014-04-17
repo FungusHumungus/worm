@@ -83,7 +83,7 @@ describe ("Worm", function() {
                 runs(function() {
                   query.select.andReturn(q.resolve([{data_id: 3, data_field1: 'onk', data_field2: 'splonk'}]));
 
-                  model.list(null, null).then(function(r) { result = r; });
+                  model.list().then(function(r) { result = r; }, function(err) { console.log(err); });
                 });
 
                 waitsFor(function() {
@@ -99,7 +99,7 @@ describe ("Worm", function() {
 
         describe("when calling get", function() {
             it("selects the correct model", function() {
-                query.select.andReturn({then: function(){}});
+                query.select.andReturn(q());
                 core.getsingle(db, 'data', 5);
                 expect(query.select).toHaveBeenCalledWith(db,
                                                           'data',
@@ -108,8 +108,8 @@ describe ("Worm", function() {
             });
 
             it("lets you select with other criteria as well", function() {
-                query.select.andReturn({then: function(){}});
-                core.get_by(db, 'data', {where: "field1 = $1", params:['onk']});
+                query.select.andReturn(q());
+                core.get_by(db, 'data', {where: "field1 = $1", params:['onk'], fetchChildren: false});
                 expect(query.select).toHaveBeenCalledWith(db, 'data',
                                                           '*',
                                                           'field1 = $1', '', ['onk'], null);
@@ -232,7 +232,7 @@ describe ("Worm", function() {
                 core.get_children(db, 'data', data);
                 expect(query.select).toHaveBeenCalledWith(db, 'child',
                                                           'child.id as child_id,child.data_id as child_data_id,child.ook1 as child_ook1',
-                                                          'data_id=$1', undefined, [5], undefined);
+                                                          'data_id=$1', '', [5], undefined);
             });
         });
 
