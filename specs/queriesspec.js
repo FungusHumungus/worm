@@ -38,6 +38,17 @@ describe('Postgres queries', function() {
                                                        'inner join onk on onk.arg = sporg.porg',
                                                        null, jasmine.any(Function));
         });
+
+        it ('should limit and offset', function() {
+          var db = createMockDB();
+          query.select(db.db, 'ooktable', 'onk, bonk', null, null, null, null, 3, 5);
+          expect(db.conn.query).toHaveBeenCalledWith('select onk, bonk ' +
+                                                     'from ooktable ' +
+                                                     'offset 3 limit 5',
+                                                     null, jasmine.any(Function));
+
+
+        });
     });
 
     describe("Update query", function() {
