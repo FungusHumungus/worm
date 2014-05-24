@@ -67,7 +67,9 @@ describe ("Worm", function() {
                 model.list();
                 expect(query.select).toHaveBeenCalledWith(db, 'data',
                                                           'data.id as data_id,data.field1 as data_field1,data.field2 as data_field2',
-                                                          '', '', undefined, undefined);
+                                                          '', '', 
+                                                          undefined, undefined,
+                                                          undefined, undefined);
             });
 
             it("passes the correct where clause", function() {
@@ -75,7 +77,9 @@ describe ("Worm", function() {
                 model.list({where: "field1 = 'spong'", orderby: 'field2'});
                 expect(query.select).toHaveBeenCalledWith(db, 'data',
                                                           'data.id as data_id,data.field1 as data_field1,data.field2 as data_field2',
-                                                          "field1 = 'spong'", 'field2', undefined, undefined);
+                                                          "field1 = 'spong'", 'field2', 
+                                                          undefined, undefined,
+                                                          undefined, undefined);
             });
 
             it("refactors the returned field names to remove the table name", function() {
@@ -104,7 +108,8 @@ describe ("Worm", function() {
                 expect(query.select).toHaveBeenCalledWith(db,
                                                           'data',
                                                           '*',
-                                                          'data.id=$1', '', [5], null);
+                                                          'data.id=$1', '', [5], null,
+                                                          undefined, undefined);
             });
 
             it("lets you select with other criteria as well", function() {
@@ -112,7 +117,8 @@ describe ("Worm", function() {
                 core.get_by(db, 'data', {where: "field1 = $1", params:['onk'], fetchChildren: false});
                 expect(query.select).toHaveBeenCalledWith(db, 'data',
                                                           '*',
-                                                          'field1 = $1', '', ['onk'], null);
+                                                          'field1 = $1', '', ['onk'], null,
+                                                          undefined, undefined);
             });
         });
 
@@ -205,7 +211,8 @@ describe ("Worm", function() {
                     .toHaveBeenCalledWith({}, 'data',
                                           'data.id as data_id,data.field1 as data_field1,data.field2 as data_field2,child.id as child_id,child.data_id as child_data_id,child.ook1 as child_ook1',
                                           '', '', undefined,
-                                          ['left join child on data.id=child.data_id']);
+                                          ['left join child on data.id=child.data_id'],
+                                          undefined, undefined);
             });
         });
 
@@ -225,14 +232,17 @@ describe ("Worm", function() {
 
             it('lets you only fetches the main record', function() {
                 result = core.getsingle(db, 'data', 5);
-                expect(query.select).toHaveBeenCalledWith(db, 'data', '*', 'data.id=$1', '', [5], null);
+                expect(query.select).toHaveBeenCalledWith(db, 'data', '*', 
+                                                          'data.id=$1', '', [5], null,
+                                                          undefined, undefined);
             });
 
             it('lets you fetch the child records', function() {
                 core.get_children(db, 'data', data);
                 expect(query.select).toHaveBeenCalledWith(db, 'child',
                                                           'child.id as child_id,child.data_id as child_data_id,child.ook1 as child_ook1',
-                                                          'data_id=$1', '', [5], undefined);
+                                                          'data_id=$1', '', [5], undefined,
+                                                          undefined, undefined);
             });
         });
 
@@ -396,7 +406,8 @@ describe ("Worm", function() {
                                           'data.id as data_id,data.field1 as data_field1,data.field2 as data_field2,child.data_id as child_data_id,child.grandchild_id as child_grandchild_id,grandchild.id as grandchild_id,grandchild.ook1 as grandchild_ook1',
                                           '', '', undefined,
                                           ['left join child on data.id=child.data_id',
-                                           'left join grandchild on child.grandchild_id=grandchild.id']);
+                                           'left join grandchild on child.grandchild_id=grandchild.id'],
+                                           undefined, undefined);
             });
         });
     });
