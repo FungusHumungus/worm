@@ -2,11 +2,7 @@
   "author": "Stephen Wakely <fungus.humungus@gmail.com>",
   "name": "wormorm",
   "description": "Worm ORM for node",
-<<<<<<< HEAD
-  "version": "0.0.3",
-=======
-  "version": "0.0.2",
->>>>>>> 3c9c9582e1b6fc62f574ca6a955fff634605ffb2
+  "version": "0.0.4",
   "repository": {
     "type": "git",
     "url": "https://github.com/FungusHumungus/worm"
