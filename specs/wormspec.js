@@ -335,7 +335,7 @@ describe ("Worm", function() {
         var db = {};
         var data_schema = {table: 'data',
                            fields: {id: null, field1: '', field2: '', children: []},
-                           relationships: [{field: 'children', maps_to: 'child', with_field: 'data_id'}]
+                           relationships: [{field: 'children', maps_to: 'child', with_field: 'data_id', cascade_delete: true}]
                           };
         var child_schema = {table: 'child',
                             primarykey: ['data_id', 'grandchild_id'],
@@ -375,8 +375,7 @@ describe ("Worm", function() {
               });
             });
 
-            it("removes the many to many row", function(done) {
-              // This call is many promises deep, so we have to wait for two cycles..
+            it("removes the cascade delete row", function(done) {
               result.then(function() {
                 expect(query.remove).toHaveBeenCalledWith(db, 'child', 'data_id=$1', [1]);
                 done();
