@@ -2,7 +2,11 @@
   "author": "Stephen Wakely <fungus.humungus@gmail.com>",
   "name": "wormorm",
   "description": "Worm ORM for node",
+<<<<<<< HEAD
+  "version": "0.0.5",
+=======
   "version": "0.0.4",
+>>>>>>> 6bc69d3346d5b46b704553854c337d7caebb71cd
   "repository": {
     "type": "git",
     "url": "https://github.com/FungusHumungus/worm"
@@ -21,6 +25,9 @@
   },
   "engines": {
     "node": "*"
+  },
+  "scripts": {
+    "test": "jasmine-node --test-dir specs/"
   },
   "license": "MIT"
 }
