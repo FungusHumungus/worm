@@ -2,26 +2,26 @@
  runs: false, waitsFor: false, process: false, require: false*/
 
 describe ("Worm", function() {
-  var q = require('q'),
-      _ = require('lodash'),
-      db = {},
-      schemas = require('../lib/schemas'),
-      core_ = require('../lib/coreworm'),
-      wormmodel_ = require('../lib/model'),
-      query,
-      core,
-      wormmodel;
+    var q = require('q'),
+        _ = require('lodash'),
+        db = {},
+        schemas = require('../lib/schemas'),
+        core_ = require('../lib/coreworm'),
+        wormmodel_ = require('../lib/model'),
+        query,
+        core,
+        wormmodel;
 
-  beforeEach(function() {
-    // Set up the mocks
-    query = jasmine.createSpyObj('query', ['insert', 'update', 'select', 'remove']);
-    core = core_(query);
-    wormmodel = wormmodel_(core);
-  });
+    beforeEach(function() {
+        // Set up the mocks
+        query = jasmine.createSpyObj('query', ['insert', 'update', 'select', 'remove']);
+        core = core_(query);
+        wormmodel = wormmodel_(core);
+    });
 
-  describe("given an invalid schema", function() {
+    describe("given an invalid schema", function() {
 
-    it("raises an error", function() {
+        it("raises an error", function() {
             // Missing fields
             expect(function() { schemas.registerSchema( {table:''} ); }).toThrow();
 
@@ -30,10 +30,10 @@ describe ("Worm", function() {
 
             // Relationships are incorrect type
             expect(function() { schemas.registerSchema( {table:'', fields:{}, relationships: {}}); }).toThrow();
+        });
     });
-  });
 
-  describe("given a simple schema", function() {
+    describe("given a simple schema", function() {
 
         var schema = {table: 'data',
                       fields: {id: null, field1: 'onk', field2: ''}
@@ -56,7 +56,7 @@ describe ("Worm", function() {
             });
 
             it("creates a model with the required fields", function() {
-              expect(data).toEqual({id: null, field1: 'onk', field2: 'ook', __diffs: jasmine.any(Function)});
+                expect(data).toEqual({id: null, field1: 'onk', field2: 'ook', __diffs: jasmine.any(Function)});
             });
         });
 
@@ -85,9 +85,9 @@ describe ("Worm", function() {
             it("refactors the returned field names to remove the table name", function() {
                 var result;
                 runs(function() {
-                  query.select.andReturn(q.resolve([{data_id: 3, data_field1: 'onk', data_field2: 'splonk'}]));
+                    query.select.andReturn(q.resolve([{data_id: 3, data_field1: 'onk', data_field2: 'splonk'}]));
 
-                  model.list().then(function(r) { result = r; }, function(err) { console.log(err); });
+                    model.list().then(function(r) { result = r; }, function(err) { console.log(err); });
                 });
 
                 waitsFor(function() {
@@ -96,7 +96,7 @@ describe ("Worm", function() {
 
                 runs(function() {
                     expect(result.length).toEqual(1);
-                  expect(result[0]).toEqual({id: 3, field1: 'onk', field2: 'splonk', __diffs: jasmine.any(Function)});
+                    expect(result[0]).toEqual({id: 3, field1: 'onk', field2: 'splonk', __diffs: jasmine.any(Function), $update: jasmine.any(Function)});
                 });
             });
         });
@@ -169,15 +169,15 @@ describe ("Worm", function() {
 
             it("should update", function(done) {
                 process.nextTick(function() {
-                  expect(query.update).toHaveBeenCalled();
-                  done();
+                    expect(query.update).toHaveBeenCalled();
+                    done();
                 });
             });
 
             it("should only update fields from the schema", function(done) {
                 process.nextTick(function() {
-                  expect(query.update).toHaveBeenCalledWith(db, 'data', {id: 33, field1: 'data'});
-                  done();
+                    expect(query.update).toHaveBeenCalledWith(db, 'data', {id: 33, field1: 'data'});
+                    done();
                 });
             });
         });
@@ -214,6 +214,17 @@ describe ("Worm", function() {
                                           ['left join child on data.id=child.data_id'],
                                           undefined, undefined);
             });
+
+            it('attaches model functions to the child records', function(done) {
+                var data = {data_id: 5, data_field1: 'ook', data_field2: 'ook', child_id: 7, child_data_id: 5, child_ook1: 'ook'};
+                query.select.andReturn(q.resolve([data]));
+                core.list({}, 'data').then(function(results) {
+
+                    expect(results[0].children[0].beuseful()).toEqual('ook');
+                    done();
+
+                });
+            });
         });
 
         describe("when calling get", function() {
@@ -244,6 +255,25 @@ describe ("Worm", function() {
                                                           'data_id=$1', '', [5], undefined,
                                                           undefined, undefined);
             });
+
+            it('lets us merge new results in and keep the model functions in the child records', function(done) {
+
+                var data = {data_id: 5, data_field1: 'ook', data_field2: 'ook', child_id: 7, child_data_id: 5, child_ook1: 'ook'};
+                query.select.andReturn(q.resolve([data]));
+                core.get_by({}, 'data').then(function(results) {
+
+                    try {
+                        var updated = results.$update({id: 5, children: [{id: 7, data_id: 5, ook1: 'onkonkonk'}]});
+
+                        expect(updated.children[0].ook1).toEqual('onkonkonk');
+                        expect(updated.children[0].beuseful()).toEqual('ook');
+                        done();
+                    } catch(ex) {
+                        console.log(ex);
+                    }
+
+                });
+            });
         });
 
         describe("when saving a model with no ids", function() {
@@ -257,7 +287,7 @@ describe ("Worm", function() {
 
                 data = {field1: 'data1', field2: 'data2', children:[{ook1: 'doto1'}]};
                 result = core.saveModel(db, 'data', data).catch(function(err){
-                  console.log(err.toString());
+                    console.log(err.toString());
                 });
             });
 
@@ -266,17 +296,17 @@ describe ("Worm", function() {
             });
 
             it("should insert the parent record", function(done) {
-              process.nextTick(function() {
-                expect(query.insert).toHaveBeenCalledWith(db, 'data', {field1: 'data1', field2: 'data2'}, {returnId: true});
-                done();
-              });
+                process.nextTick(function() {
+                    expect(query.insert).toHaveBeenCalledWith(db, 'data', {field1: 'data1', field2: 'data2'}, {returnId: true});
+                    done();
+                });
             });
 
             it("should insert the child record with the parents id", function(done) {
-              process.nextTick(function() {
-                expect(query.insert).toHaveBeenCalledWith(db, 'child', {ook1: 'doto1', data_id:33}, {returnId: true});
-                done();
-              });
+                process.nextTick(function() {
+                    expect(query.insert).toHaveBeenCalledWith(db, 'child', {ook1: 'doto1', data_id:33}, {returnId: true});
+                    done();
+                });
             });
         });
 
@@ -300,7 +330,7 @@ describe ("Worm", function() {
                     schemas.registerSchema(child_schema);
 
                     data = {field1: 'data1', field2: 'data2', children:[{ook1: 'doto1'}]};
-                  console.log('saving fail');
+                    console.log('saving fail');
                     result = core.saveModel(db, 'data', data);
                 } catch(ex) {
                     console.log('Error when save fails : ' + ex.toString());
@@ -315,7 +345,7 @@ describe ("Worm", function() {
                 var passed = false, failed = false;
                 runs(function() {
                     result.then(function() { passed = true; })
-                          .catch(function() { failed = true; });
+                        .catch(function() { failed = true; });
                 });
 
                 waitsFor(function() {
@@ -369,17 +399,17 @@ describe ("Worm", function() {
             });
 
             it("updates the parent table", function(done) {
-              result.then(function() {
-                expect(query.update).toHaveBeenCalledWith(db, 'data', {id: 1, field1: 'ook1', field2: 'ook2'});
-                done();
-              });
+                result.then(function() {
+                    expect(query.update).toHaveBeenCalledWith(db, 'data', {id: 1, field1: 'ook1', field2: 'ook2'});
+                    done();
+                });
             });
 
             it("removes the cascade delete row", function(done) {
-              result.then(function() {
-                expect(query.remove).toHaveBeenCalledWith(db, 'child', 'data_id=$1', [1]);
-                done();
-              });
+                result.then(function() {
+                    expect(query.remove).toHaveBeenCalledWith(db, 'child', 'data_id=$1', [1]);
+                    done();
+                });
             });
         });
 
@@ -406,7 +436,7 @@ describe ("Worm", function() {
                                           '', '', undefined,
                                           ['left join child on data.id=child.data_id',
                                            'left join grandchild on child.grandchild_id=grandchild.id'],
-                                           undefined, undefined);
+                                          undefined, undefined);
             });
         });
     });
